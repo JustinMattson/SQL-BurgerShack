@@ -33,19 +33,28 @@ namespace BurgerShack.Services
       return newBurger;
     }
 
-    internal Burger Edit(Burger editBurger)
+    internal Burger Edit(Burger editBurger, string userEmail)
     {
       Burger original = Get(editBurger.Id);
-      original.Name = editBurger.Name.Length > 0 ? editBurger.Name : original.Name;
-      editBurger.Description = editBurger.Description.Length > 0 ? editBurger.Description : original.Description;
-      editBurger.Price = editBurger.Price > 0 ? editBurger.Price : original.Price;
+      if (original.InspiredBy != userEmail)
+      {
+        throw new UnauthorizedAccessException("You cannot modify this menu item!");
+      }
+      // try this with UniQue
+      original.Name = editBurger.Name == null ? original.Name : editBurger.Name;
+      original.Description = editBurger.Description == null ? original.Description : editBurger.Description;
+      original.Price = editBurger.Price > 0 ? editBurger.Price : original.Price;
 
       _repo.Edit(original);
       return original;
     }
-    internal Burger Delete(int id)
+    internal Burger Delete(int id, string userEmail)
     {
       Burger burgerToDelete = Get(id);
+      if (burgerToDelete.InspiredBy != userEmail)
+      {
+        throw new UnauthorizedAccessException("You did not inspire this burger, burger off!");
+      }
       _repo.Delete(burgerToDelete);
       return burgerToDelete;
     }

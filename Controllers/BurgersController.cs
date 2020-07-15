@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using BurgerShack.Models;
 using BurgerShack.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BurgerShack.Controllers
@@ -64,10 +66,14 @@ namespace BurgerShack.Controllers
     }
 
     [HttpPost]
+    [Authorize]
     public ActionResult<Burger> Create([FromBody] Burger newBurger)
     {
       try
       {
+        // Authorize will force the user to be logged in, but does not restrict access to POST, PUT, DELETE once logged in.
+        string UserEmail = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value; // similar to req.userInfo.email
+        newBurger.InspiredBy = UserEmail;
         return Ok(_service.Create(newBurger));
       }
       catch (Exception e)
@@ -78,12 +84,14 @@ namespace BurgerShack.Controllers
 
 
     [HttpPut("{id}")]
+    [Authorize]
     public ActionResult<Burger> Edit([FromBody] Burger editBurger, int id)
     {
       try
       {
+        string UserEmail = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value; // similar to req.userInfo.email
         editBurger.Id = id;
-        return Ok(_service.Edit(editBurger));
+        return Ok(_service.Edit(editBurger, UserEmail));
       }
       catch (Exception e)
       {
@@ -96,7 +104,8 @@ namespace BurgerShack.Controllers
     {
       try
       {
-        return Ok(_service.Delete(id));
+        string UserEmail = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value; // similar to req.userInfo.email
+        return Ok(_service.Delete(id, UserEmail));
       }
       catch (Exception e)
       {

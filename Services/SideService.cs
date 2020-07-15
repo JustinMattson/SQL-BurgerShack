@@ -33,21 +33,29 @@ namespace BurgerShack.Services
       return newSide;
     }
 
-    internal Side Edit(Side editSide)
+    internal Side Edit(Side editSide, string userEmail)
     {
       Side original = Get(editSide.Id);
-      original.Name = editSide.Name.Length > 0 ? editSide.Name : original.Name;
-      editSide.Description = editSide.Description.Length > 0 ? editSide.Description : original.Description;
-      editSide.Price = editSide.Price > 0 ? editSide.Price : original.Price;
+      if (original.InspiredBy != userEmail)
+      {
+        throw new UnauthorizedAccessException("You cannot modify this menu item!");
+      }
+      original.Name = editSide.Name == null ? original.Name : editSide.Name;
+      original.Description = editSide.Description == null ? original.Description : editSide.Description;
+      original.Price = editSide.Price > 0 ? editSide.Price : original.Price;
 
       _repo.Edit(original);
       return original;
     }
-    internal Side Delete(int id)
+    internal Side Delete(int id, string userEmail)
     {
-      Side SideToDelete = Get(id);
-      _repo.Delete(SideToDelete);
-      return SideToDelete;
+      Side sideToDelete = Get(id);
+      if (sideToDelete.InspiredBy != userEmail)
+      {
+        throw new UnauthorizedAccessException("You did not inspire this side, burger off!");
+      }
+      _repo.Delete(sideToDelete);
+      return sideToDelete;
     }
   }
 }

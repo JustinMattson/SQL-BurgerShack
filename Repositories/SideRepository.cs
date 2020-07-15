@@ -29,9 +29,9 @@ namespace BurgerShack.Repositories
     {
       string sql = @"
       INSERT INTO sides
-      (name, description, price)
+      (name, inspiredby, description, price)
       VALUES
-      (@Name, @Description, @Price)
+      (@Name, @InspiredBy, @Description, @Price);
       SELECT LAST_INSERT_ID();
       ";
       int id = _db.ExecuteScalar<int>(sql, newSide);
@@ -44,6 +44,7 @@ namespace BurgerShack.Repositories
       UPDATE sides
       SET
         name = @Name,
+        inspiredby = @InspiredBy,
         price = @Price,
         description = @Description
       WHERE id = @Id;

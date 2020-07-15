@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using BurgerShack.Models;
 using BurgerShack.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BurgerShack.Controllers
@@ -26,7 +27,7 @@ namespace BurgerShack.Controllers
     {
       try
       {
-        return Ok(_service.Get());
+        return Ok(_comboService.Get());
       }
       catch (Exception e)
       {
@@ -40,7 +41,7 @@ namespace BurgerShack.Controllers
     {
       try
       {
-        return Ok(_service.Get(id));
+        return Ok(_comboService.Get(id));
       }
       catch (Exception e)
       {
@@ -64,6 +65,7 @@ namespace BurgerShack.Controllers
     // }
 
     [HttpPost]
+    [Authorize]
     public ActionResult<DbCombo> Create([FromBody] DbCombo newCombo)
     {
       try
@@ -78,6 +80,7 @@ namespace BurgerShack.Controllers
 
 
     [HttpPut("{id}")]
+    [Authorize]
     public ActionResult<DbCombo> Edit([FromBody] DbCombo editCombo, int id)
     {
       try
@@ -92,11 +95,12 @@ namespace BurgerShack.Controllers
     }
 
     [HttpDelete("{id}")]
+    [Authorize]
     public ActionResult<DbCombo> Delete(int id)
     {
       try
       {
-        return Ok(_service.Delete(id));
+        return Ok(_comboService.Delete(id));
       }
       catch (Exception e)
       {
